@@ -34,6 +34,10 @@ from rasters import SpatialGeometry
 from solar_apparent_time import calculate_solar_day_of_year, calculate_solar_hour_of_day
 from sun_angles import daylight_from_SHA, sunrise_from_SHA, SHA_deg_from_DOY_lat
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def daylight_Rn_integration_verma(
         Rn_Wm2: Union[Raster, np.ndarray, float],
         time_UTC: Union[datetime, str, list, np.ndarray] = None,
@@ -100,10 +104,9 @@ def daylight_Rn_integration_verma(
         if isinstance(lat, list):
             lat = np.array(lat)
 
-    # print(type(time_UTC), time_UTC)
-
     # If day_of_year is not provided, try to infer from time_UTC
     if day_of_year is None and time_UTC is not None:
+        logger.info("calculating solar day of year")
         day_of_year = calculate_solar_day_of_year(
             time_UTC=time_UTC,
             geometry=geometry,
@@ -112,6 +115,7 @@ def daylight_Rn_integration_verma(
         )    
 
     if hour_of_day is None and time_UTC is not None:
+        logger.info("calculating solar hour of day")
         hour_of_day = calculate_solar_hour_of_day(
             time_UTC=time_UTC,
             geometry=geometry,
@@ -120,14 +124,10 @@ def daylight_Rn_integration_verma(
         )
 
     if daylight_hours is None or sunrise_hour is None and day_of_year is not None and lat is not None:
+        logger.info("calculating daylight hours and sunrise hour")
         sha_deg = SHA_deg_from_DOY_lat(day_of_year, lat)
         daylight_hours = daylight_from_SHA(sha_deg)
         sunrise_hour = sunrise_from_SHA(sha_deg)
-
-    # print("Rn_Wm2", Rn_Wm2.shape)
-    # print("hour_of_day", hour_of_day.shape)
-    # print("sunrise_hour", sunrise_hour.shape)
-    # print("daylight_hours", daylight_hours.shape)
 
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore")

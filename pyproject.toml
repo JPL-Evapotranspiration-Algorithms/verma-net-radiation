@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 
 [project]
 name = "verma-net-radiation"
-version = "1.8.0"
+version = "1.8.1"
 description = "Net Radiation and Daily Upscaling Remote Sensing in Python"
 readme = "README.md"
 authors = [
