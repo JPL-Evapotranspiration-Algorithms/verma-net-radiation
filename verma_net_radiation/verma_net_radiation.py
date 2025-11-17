@@ -5,3 +5,4 @@ from .incoming_longwave_radiation import incoming_longwave_radiation
 from .outgoing_longwave_radiation import outgoing_longwave_radiation
 from .brutsaert_atmospheric_emissivity import brutsaert_atmospheric_emissivity
 from .verify import verify
+from .ECOv002_calval_verma_net_radiation_inputs import load_ECOv002_calval_verma_net_radiation_inputs
