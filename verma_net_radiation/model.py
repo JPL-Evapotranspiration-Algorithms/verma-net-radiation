@@ -124,6 +124,8 @@ def verma_net_radiation(
     if SWin_Wm2 is None:
         raise ValueError("incoming shortwave radiation (SWin) not given")
 
+    results["SWin_Wm2"] = SWin_Wm2
+
     # Retrieve air temperature if not provided, using GEOS5FP and geometry/time
     if Ta_C is None and spatial_temporal_processing:
         Ta_C = GEOS5FP_connection.Ta_C(
