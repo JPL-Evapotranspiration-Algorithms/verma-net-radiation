@@ -45,6 +45,7 @@ from check_distribution import check_distribution
 from GEOS5FP import GEOS5FP
 
 from .constants import *
+from .exceptions import *
 from .brutsaert_atmospheric_emissivity import brutsaert_atmospheric_emissivity
 from .incoming_longwave_radiation import incoming_longwave_radiation
 from .outgoing_longwave_radiation import outgoing_longwave_radiation
@@ -64,7 +65,8 @@ def verma_net_radiation(
         GEOS5FP_connection: GEOS5FP = None,
         resampling: str = RESAMPLING_METHOD,
         cloud_mask: Union[Raster, np.ndarray, float, None] = None,
-    upscale_to_daylight: bool = UPSCALE_TO_DAYLIGHT,
+        upscale_to_daylight: bool = UPSCALE_TO_DAYLIGHT,
+        offline_mode: bool = False
         ) -> Dict[str, Union[Raster, np.ndarray, float]]:
     """
     Calculate instantaneous net radiation and its components.
@@ -108,6 +110,22 @@ def verma_net_radiation(
 
     raster_processing = isinstance(geometry, RasterGeometry) or isinstance(ST_C, Raster)
     spatial_temporal_processing = geometry is not None and time_UTC is not None
+
+    # Check for missing variables in offline mode before any GEOS-5 FP retrievals
+    if offline_mode:
+        missing_vars = []
+        
+        if Ta_C is None:
+            missing_vars.append("Ta_C")
+        if RH is None:
+            missing_vars.append("RH")
+        if SWin_Wm2 is None:
+            missing_vars.append("SWin_Wm2")
+            
+        if missing_vars:
+            raise MissingOfflineParameter(
+                f"missing PT-JPL-SM inputs in offline mode: {', '.join(missing_vars)}"
+            )
 
     # Create GEOS5FP connection if not provided
     if GEOS5FP_connection is None:
